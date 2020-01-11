@@ -1,0 +1,20 @@
+//
+
+.table {
+  &-header,
+  &-row {
+    display: flex;
+    border: 1px solid #ddd;
+  }
+
+  .approved {
+    color: green;
+  }
+  .denied {
+    color: red;
+  }
+
+  &-actions {
+    min-height: 50px;
+  }
+}
