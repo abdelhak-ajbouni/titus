@@ -16,7 +16,7 @@ const logic = kea({
   })
 });
 
-const Table = ({ config, data }) => {
+const Table = ({ config, data, onDelete, onApprove, onDeny, onEdit }) => {
   const { selectedRow } = useValues(logic);
   const { selectRow } = useActions(logic);
 
@@ -34,17 +34,20 @@ const Table = ({ config, data }) => {
   };
 
   const renderTableRows = () => {
-    return data.map((element, rowIndex) => {
-      return (
-        <div className="table-row" key={rowIndex}>
-          {renderTableCell(element, rowIndex)}
-        </div>
-      );
-    });
+    return (
+      data &&
+      data.map((element, index) => {
+        return (
+          <div className="table-row" key={index}>
+            {renderTableCell(element, element.id)}
+          </div>
+        );
+      })
+    );
   };
 
-  const renderTableCell = (element, rowIndex) => {
-    const array = Object.keys(element);
+  const renderTableCell = (element, id) => {
+    const array = config.map(el => el.key);
     const ar = ["checkbox", ...array];
     return ar.map((key, index) => (
       <div
@@ -52,13 +55,13 @@ const Table = ({ config, data }) => {
         key={index}
         style={{ width: `calc(100% / ${config.length})` }}
       >
-        {renderCellValue(key, element[key], rowIndex)}
+        {renderCellValue(key, element[key], id)}
       </div>
     ));
   };
 
-  const renderCellValue = (key, element, rowIndex) => {
-    const isChecked = selectedRow === rowIndex;
+  const renderCellValue = (key, element, id) => {
+    const isChecked = selectedRow === id;
     switch (key) {
       case "checkbox":
         return (
@@ -66,7 +69,7 @@ const Table = ({ config, data }) => {
             type="checkbox"
             checked={isChecked}
             onChange={() => {
-              isChecked ? selectRow(null) : selectRow(rowIndex);
+              isChecked ? selectRow(null) : selectRow(id);
             }}
           />
         );
@@ -84,11 +87,33 @@ const Table = ({ config, data }) => {
     let actions = [];
     if (selectedRow !== null)
       actions = [
-        <button className="btn-approve" type="button">
+        <button
+          className="btn btn-approve"
+          type="button"
+          onClick={() => onApprove(selectedRow)}
+        >
           Approve
         </button>,
-        <button className="btn-deny" type="button">
+        <button
+          className="btn btn-deny"
+          type="button"
+          onClick={() => onDeny(selectedRow)}
+        >
           Deny
+        </button>,
+        <button
+          className="btn btn-approve"
+          type="button"
+          onClick={() => onEdit(selectedRow)}
+        >
+          Edit
+        </button>,
+        <button
+          className="btn btn-deny"
+          type="button"
+          onClick={() => onDelete(selectedRow)}
+        >
+          Delete
         </button>
       ];
     return actions;
