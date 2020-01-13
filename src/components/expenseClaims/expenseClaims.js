@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import axios from "axios";
 import { get } from "lodash";
 import uniqid from "uniqid";
+import { navigate } from "@reach/router";
 import { kea, useActions, useValues } from "kea";
 
 import Table from "./components/table";
@@ -12,7 +13,6 @@ import "./expenseClaims.scss";
 const logic = kea({
   actions: () => ({
     setClaims: claims => ({ claims }),
-    setEditView: editView => ({ editView }),
     setSelectedClaim: selectedClaim => ({ selectedClaim })
   }),
 
@@ -23,14 +23,8 @@ const logic = kea({
         [actions.setClaims]: (state, payload) => payload.claims
       }
     ],
-    editView: [
-      false,
-      {
-        [actions.setEditView]: (state, payload) => payload.editView
-      }
-    ],
     selectedClaim: [
-      false,
+      null,
       {
         [actions.setSelectedClaim]: (state, payload) => payload.selectedClaim
       }
@@ -47,8 +41,8 @@ const config = [
 ];
 
 const ExpenseClaims = () => {
-  const { claims, editView, selectedClaim } = useValues(logic);
-  const { setClaims, setEditView, setSelectedClaim } = useActions(logic);
+  const { claims, selectedClaim } = useValues(logic);
+  const { setClaims, setSelectedClaim } = useActions(logic);
 
   useEffect(() => {
     getClaims();
@@ -56,10 +50,12 @@ const ExpenseClaims = () => {
   }, []);
 
   const addClaims = claims => {
-    axios.post(
-      "https://www.jsonstore.io/e3f724606c569fe15d8557f2a7c72a05b29f0e18b23784e2ce7b9261214f5c7c",
-      claims
-    );
+    axios
+      .post(
+        "https://www.jsonstore.io/e3f724606c569fe15d8557f2a7c72a05b29f0e18b23784e2ce7b9261214f5c7c",
+        claims
+      )
+      .then(() => getClaims());
   };
   const getClaims = () => {
     axios
@@ -73,7 +69,6 @@ const ExpenseClaims = () => {
 
   const handleOnAddClaim = newClaim => {
     addClaims([...claims, { ...newClaim, id: uniqid() }]);
-    getClaims();
   };
 
   const handleOnDelete = selectedRow => {
@@ -105,7 +100,6 @@ const ExpenseClaims = () => {
 
   const handleOnEdit = selectedRow => {
     setSelectedClaim(claims.find(({ id }) => id === selectedRow));
-    setEditView(true);
   };
 
   const handleOnUpdateClaim = updatedClaim => {
@@ -117,27 +111,33 @@ const ExpenseClaims = () => {
       }
     });
     addClaims(updatedClaims);
+    setSelectedClaim(null);
   };
 
-  console.log("claims", claims);
+  console.log("selectedClaim", selectedClaim);
 
   return (
     <div className="expense-claims">
-      <>
-        <NewClaim
-          onAddClaim={handleOnAddClaim}
-          onUpdateClaim={handleOnUpdateClaim}
-          data={selectedClaim}
-        />
-        <Table
-          config={config}
-          data={claims}
-          onDelete={selectedRow => handleOnDelete(selectedRow)}
-          onApprove={selectedRow => handleOnApprove(selectedRow)}
-          onDeny={selectedRow => handleOnDeny(selectedRow)}
-          onEdit={selectedRow => handleOnEdit(selectedRow)}
-        />
-      </>
+      <header className="header">
+        <h1 className="title">Claims</h1>
+        <button className="btn" onClick={() => navigate("/summary")}>
+          view summary
+        </button>
+      </header>
+
+      <NewClaim
+        onAddClaim={handleOnAddClaim}
+        onUpdateClaim={handleOnUpdateClaim}
+        data={selectedClaim}
+      />
+      <Table
+        config={config}
+        data={claims}
+        onDelete={selectedRow => handleOnDelete(selectedRow)}
+        onApprove={selectedRow => handleOnApprove(selectedRow)}
+        onDeny={selectedRow => handleOnDeny(selectedRow)}
+        onEdit={selectedRow => handleOnEdit(selectedRow)}
+      />
     </div>
   );
 };

@@ -1,0 +1,36 @@
+.summary-report {
+  &-input {
+    height: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 24px 8px;
+    padding: 4px;
+  }
+
+  &-details {
+    text-align: left;
+    width: 500px;
+    margin: auto;
+  }
+
+  &-elem {
+    margin: 8px 0;
+  }
+
+  &-highest {
+    margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    background: #9e9e9e1f;
+    padding: 8px;
+    border-radius: 4px;
+  }
+
+  label {
+    font-weight: 700;
+  }
+
+  span {
+    margin: 4px 8px;
+  }
+}

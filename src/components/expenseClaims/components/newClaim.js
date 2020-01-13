@@ -29,14 +29,21 @@ const NewClaim = ({ onAddClaim, onUpdateClaim, data }) => {
   const { addClaim } = useActions(logic);
 
   useEffect(() => {
-    console.log("data", data);
-    data && addClaim(data);
+    data
+      ? addClaim(data)
+      : addClaim({
+          name: "",
+          date: "",
+          description: "",
+          amount: ""
+        });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   return (
-    <div>
+    <div className="new-claim">
       <select
+        className="new-claim-select"
         value={newClaim.name}
         onChange={e => addClaim({ ...newClaim, name: e.target.value })}
       >
@@ -48,25 +55,28 @@ const NewClaim = ({ onAddClaim, onUpdateClaim, data }) => {
         ))}
       </select>
       <input
+        className="new-claim-input"
         type="date"
         name="date"
         value={newClaim.date}
         onChange={e => addClaim({ ...newClaim, date: e.target.value })}
       />
       <input
+        className="new-claim-input"
         type="text"
         name="description"
         value={newClaim.description}
         onChange={e => addClaim({ ...newClaim, description: e.target.value })}
       />
       <input
+        className="new-claim-input"
         type="number"
         name="amount"
         value={newClaim.amount}
         onChange={e => addClaim({ ...newClaim, amount: e.target.value })}
       />
       <button
-        className="btn"
+        className="new-claim-btn"
         type="button"
         onClick={() => {
           data ? onUpdateClaim(newClaim) : onAddClaim(newClaim);
